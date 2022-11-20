@@ -1,14 +1,17 @@
 package com.example.sportrates.conroller;
 
 
-import com.example.sportrates.exception.ResourceNotFoundException;
+import com.example.sportrates.db_model.Balance;
 import com.example.sportrates.db_model.Match;
+import com.example.sportrates.db_model.Rate;
+import com.example.sportrates.repository.BalanceRepository;
 import com.example.sportrates.repository.MatchRepository;
+import com.example.sportrates.repository.RateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class MatchController {
@@ -16,42 +19,67 @@ public class MatchController {
     @Autowired
     private MatchRepository matchRepository;
 
+    @Autowired
+    private RateRepository rateRepository;
+
+    @Autowired
+    private BalanceRepository balanceRepository;
+
+
     //get matches
     @GetMapping("/matches")
     public List<Match> getAllMatches() {
         return this.matchRepository.findAll();
     }
 
-    //get matches by id
-    @GetMapping("/matches/{id}")
-    public ResponseEntity<Match> getMatchById(
-            @PathVariable(value = "id") Long matchId
-    ) throws ResourceNotFoundException {
-        Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new ResourceNotFoundException("not Found"));
-        return ResponseEntity.ok().body(match);
-
-    }
-
-
     //save match
     @PostMapping("/addmatch")
     public Match createMatch(@RequestBody Match match) {
+        match.setResult(null);
         return this.matchRepository.save(match);
     }
 
-    //update match
-    @PutMapping("/finishmatch/{id}")
-    public ResponseEntity<Match> finishMatch(
-            @PathVariable(value = "id") Long matchId,
-            @RequestParam String result
-    ) throws ResourceNotFoundException {
-        Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new ResourceNotFoundException("not found"));
-        match.setResult(result);
-        return ResponseEntity.ok(this.matchRepository.save(match));
+    //delete match
+    @PutMapping("/deletematch")
+    public void deleteMatch(
+            @RequestParam(name = "id") Long id
+    ){
+        matchRepository.deleteById(id);
     }
 
-    //delete match
+    //update match
+    @PutMapping("/finishmatch")
+    public void finishMatch(
+            @RequestParam(name = "id") Long id
+    ) {
+        Match match = matchRepository.findById(id).get();
+        List<Rate> rateList = match.getRates();
+        int result = getRandomNumber(1, 2);
+        double winCoefficient;
+        if (result == 1) {
+            match.setResult(match.getFirstPlayerName());
+            winCoefficient = match.getFirstCoefficient();
+        } else{
+            match.setResult(match.getSecondPlayerName());
+            winCoefficient = match.getSecondCoefficient();
+        }
+        for (Rate rate : rateList) {
+            Balance userBalance = balanceRepository.findByUserUserId(rate.getUser().getUserId());
+            if (Objects.equals(rate.getChoice(), match.getResult())) {
+                 userBalance.setOverallBalance(userBalance.getOverallBalance() + (rate.getRateSum() * winCoefficient));
+            } else {
+                    userBalance.setOverallBalance(userBalance.getOverallBalance() - rate.getRateSum());
+            }
+            userBalance.setRateBalance(userBalance.getRateBalance() - rate.getRateSum());
+            balanceRepository.save(userBalance);
+            rate.setStatus("closed");
+            rateRepository.save(rate);
+        }
+        matchRepository.save(match);
+    }
+
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
 
 }

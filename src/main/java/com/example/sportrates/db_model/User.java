@@ -24,7 +24,7 @@ public class User {
     private String role;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    @JoinColumn(name = "balance_id", referencedColumnName = "balanceId")
     private Balance balance;
 
     @OneToMany
@@ -82,5 +82,9 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Balance getBalance() {
+        return balance;
     }
 }

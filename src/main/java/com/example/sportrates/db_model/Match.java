@@ -114,4 +114,6 @@ public class Match {
     public void setResult(String result) {
         this.result = result;
     }
+
+    public List<Rate> getRates(){return rates;}
 }

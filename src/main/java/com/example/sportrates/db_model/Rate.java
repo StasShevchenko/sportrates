@@ -1,7 +1,10 @@
 package com.example.sportrates.db_model;
 
 
+import com.example.sportrates.model.RateInfo;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "rate")
@@ -14,12 +17,19 @@ public class Rate {
     @Column(name = "choice")
     private String choice;
 
-
     @Column(name = "rate_sum")
     private int rateSum;
 
     @Column(name = "status")
     private String status;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    private User user;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "match_id", referencedColumnName = "matchId")
+    private Match match;
 
     public Rate() {
         super();
@@ -30,6 +40,8 @@ public class Rate {
         this.rateSum = rateSum;
         this.status = status;
     }
+
+
 
     public Long getRateId() {
         return rateId;
@@ -61,5 +73,48 @@ public class Rate {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user){
+        this.user = user;
+    }
+
+    public void setMatch(Match match){
+        this.match = match;
+    }
+
+    public Match getMatch() {
+        return match;
+    }
+
+    public RateInfo mapToRateInfo(){
+        RateInfo rateInfo = new RateInfo();
+        rateInfo.setChoice(choice);
+        rateInfo.setRateSum(rateSum);
+        rateInfo.setMatchName(match.getMatchName());
+        if (Objects.equals(choice, match.getFirstPlayerName())) {
+            rateInfo.setCoefficient(match.getFirstCoefficient());
+        }
+        else{
+            rateInfo.setCoefficient(match.getSecondCoefficient());
+        }
+        if (Objects.equals(status, "open")) {
+            rateInfo.setStatus("open");
+            match.setResult(null);
+        }
+        else {
+            rateInfo.setStatus("closed");
+            if (Objects.equals(choice, match.getResult())) {
+                rateInfo.setResult(1);
+            }
+            else{
+                rateInfo.setResult(0);
+            }
+        }
+         return rateInfo;
     }
 }

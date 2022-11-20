@@ -11,10 +11,14 @@ public class Balance {
     private long balanceId;
 
     @Column(name = "overall_balance")
-    private int overallBalance;
+    private double overallBalance;
 
     @Column(name = "rate_balance")
-    private int rateBalance;
+    private double rateBalance;
+
+    @OneToOne(mappedBy = "balance")
+    private User user;
+
 
     public Balance(){
         super();
@@ -34,19 +38,19 @@ public class Balance {
         this.balanceId = balanceId;
     }
 
-    public int getOverallBalance() {
+    public double getOverallBalance() {
         return overallBalance;
     }
 
-    public void setOverallBalance(int overallBalance) {
+    public void setOverallBalance(double overallBalance) {
         this.overallBalance = overallBalance;
     }
 
-    public int getRateBalance() {
+    public double getRateBalance() {
         return rateBalance;
     }
 
-    public void setRateBalance(int rateBalance) {
+    public void setRateBalance(double rateBalance) {
         this.rateBalance = rateBalance;
     }
 }
