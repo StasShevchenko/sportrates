@@ -4,6 +4,7 @@ package com.example.sportrates.conroller;
 import com.example.sportrates.db_model.Balance;
 import com.example.sportrates.db_model.Match;
 import com.example.sportrates.db_model.Rate;
+import com.example.sportrates.model.MatchInfo;
 import com.example.sportrates.repository.BalanceRepository;
 import com.example.sportrates.repository.MatchRepository;
 import com.example.sportrates.repository.RateRepository;
@@ -28,12 +29,15 @@ public class MatchController {
 
     //get matches
     @GetMapping("/matches")
-    public List<Match> getAllMatches() {
-        return this.matchRepository.findAll();
+    @CrossOrigin(origins = "*")
+    @ResponseBody
+    public List<MatchInfo> getAllMatches() {
+        return this.matchRepository.findAll().stream().map(match -> match.mapToMatchInfo()).toList();
     }
 
     //save match
     @PostMapping("/addmatch")
+    @CrossOrigin(origins = "*")
     public Match createMatch(@RequestBody Match match) {
         match.setResult(null);
         return this.matchRepository.save(match);
@@ -41,6 +45,7 @@ public class MatchController {
 
     //delete match
     @PutMapping("/deletematch")
+    @CrossOrigin(origins = "*")
     public void deleteMatch(
             @RequestParam(name = "id") Long id
     ){
@@ -49,6 +54,7 @@ public class MatchController {
 
     //update match
     @PutMapping("/finishmatch")
+    @CrossOrigin(origins = "*")
     public void finishMatch(
             @RequestParam(name = "id") Long id
     ) {

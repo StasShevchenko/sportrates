@@ -1,5 +1,7 @@
 package com.example.sportrates.db_model;
 
+import com.example.sportrates.model.MatchInfo;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -116,4 +118,17 @@ public class Match {
     }
 
     public List<Rate> getRates(){return rates;}
+
+    public MatchInfo mapToMatchInfo(){
+        MatchInfo matchInfo = new MatchInfo();
+        matchInfo.setMatchName(matchName);
+        matchInfo.setGameName(gameName);
+        matchInfo.setFirstPlayerName(firstPlayerName);
+        matchInfo.setSecondPlayerName(secondPlayerName);
+        matchInfo.setFirstCoefficient(firstCoefficient);
+        matchInfo.setSecondCoefficient(secondCoefficient);
+        matchInfo.setResult(result);
+        matchInfo.setMatchId(matchId);
+        return matchInfo;
+    }
 }

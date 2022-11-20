@@ -32,6 +32,7 @@ public class RateController {
 
 
     @PostMapping("/addrate")
+    @CrossOrigin(origins = "*")
     public ResponseEntity addRate(
             @RequestBody Rate rate,
             @RequestParam(name = "userId") Long userId,
@@ -53,6 +54,7 @@ public class RateController {
     }
 
     @GetMapping("/activematches")
+    @CrossOrigin(origins = "*")
     public List<Match> getActiveMatches() {
         List<Match> matches = matchRepository.findAll();
         matches = matches.stream().filter(
@@ -62,6 +64,7 @@ public class RateController {
     }
 
     @GetMapping("/rates")
+    @CrossOrigin(origins = "*")
     public List<RateInfo> getUserRates(
             @RequestParam(name = "userId") Long userId
     ){

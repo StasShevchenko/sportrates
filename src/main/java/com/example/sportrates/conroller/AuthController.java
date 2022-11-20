@@ -18,6 +18,7 @@ public class AuthController {
     UserRepository userRepository;
 
     @PostMapping("/register")
+    @CrossOrigin(origins = "*")
     public ResponseEntity register(
             @RequestBody RegisterUserCredentials userCredentials
     ) {
@@ -35,6 +36,7 @@ public class AuthController {
     }
 
     @GetMapping("/login")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<LoginUserCredentials> login(
             @RequestParam(name = "login") String login,
             @RequestParam(name = "password") String password
