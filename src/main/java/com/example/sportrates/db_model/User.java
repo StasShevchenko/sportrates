@@ -27,6 +27,10 @@ public class User {
     @JoinColumn(name = "balance_id", referencedColumnName = "balanceId")
     private Balance balance;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id", referencedColumnName = "imageId")
+    private Image image;
+
     @OneToMany
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private List<Rate> rates;
@@ -86,5 +90,13 @@ public class User {
 
     public Balance getBalance() {
         return balance;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
 }

@@ -48,6 +48,7 @@ public class AuthController {
             LoginUserCredentials userCredentials = new LoginUserCredentials();
             userCredentials.setId(user.getUserId());
             userCredentials.setStatus(user.getRole());
+            userCredentials.setName(user.getUserName());
             return ResponseEntity.ok(userCredentials);
         }
     }
