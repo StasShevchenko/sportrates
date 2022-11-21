@@ -27,7 +27,7 @@ public class User {
     @JoinColumn(name = "balance_id", referencedColumnName = "balanceId")
     private Balance balance;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", referencedColumnName = "imageId")
     private Image image;
 

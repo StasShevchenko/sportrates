@@ -1,5 +1,7 @@
 package com.example.sportrates.db_model;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 
 @Entity
