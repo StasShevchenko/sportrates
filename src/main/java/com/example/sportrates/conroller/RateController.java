@@ -5,6 +5,7 @@ import com.example.sportrates.db_model.Balance;
 import com.example.sportrates.db_model.Match;
 import com.example.sportrates.db_model.Rate;
 import com.example.sportrates.db_model.User;
+import com.example.sportrates.model.MatchInfo;
 import com.example.sportrates.model.RateInfo;
 import com.example.sportrates.repository.MatchRepository;
 import com.example.sportrates.repository.RateRepository;
@@ -41,7 +42,7 @@ public class RateController {
         rate.setStatus("open");
         Match match = matchRepository.findById(matchId).get();
         if (match.getResult() != null) {
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         User user = userRepository.findById(userId).get();
         rate.setMatch(match);
@@ -55,24 +56,28 @@ public class RateController {
 
     @GetMapping("/activematches")
     @CrossOrigin(origins = "*")
-    public List<Match> getActiveMatches() {
+    public List<MatchInfo> getActiveMatches() {
         List<Match> matches = matchRepository.findAll();
         matches = matches.stream().filter(
                 match -> match.getResult() == null
         ).toList();
-        return matches;
+        List<MatchInfo> matchInfos = matches.stream().map((Match::mapToMatchInfo)).toList();
+        return matchInfos;
     }
 
     @GetMapping("/rates")
     @CrossOrigin(origins = "*")
     public List<RateInfo> getUserRates(
             @RequestParam(name = "userId") Long userId
-    ){
+    ) {
         List<RateInfo> rateInfoList = new ArrayList<>();
         List<Rate> rates = rateRepository.findByUserUserId(userId);
         for (Rate rate : rates) {
             rateInfoList.add(rate.mapToRateInfo());
         }
+        rateInfoList = rateInfoList.stream().sorted((firstRate, secondRate) -> {
+            return -firstRate.getStatus().compareTo(secondRate.getStatus());
+        }).toList();
         return rateInfoList;
     }
 
