@@ -60,7 +60,7 @@ public class MatchController {
     ) {
         Match match = matchRepository.findById(id).get();
         List<Rate> rateList = match.getRates();
-        int result = getRandomNumber(1, 2);
+        int result = getRandomNumber(1, 3);
         double winCoefficient;
         if (result == 1) {
             match.setResult(match.getFirstPlayerName());
