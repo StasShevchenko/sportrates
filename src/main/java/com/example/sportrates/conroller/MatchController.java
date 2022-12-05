@@ -11,7 +11,9 @@ import com.example.sportrates.repository.RateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 
 @RestController
@@ -55,11 +57,11 @@ public class MatchController {
     //update match
     @PutMapping("/finishmatch")
     @CrossOrigin(origins = "*")
-    public void finishMatch(
+    public synchronized void finishMatch(
             @RequestParam(name = "id") Long id
     ) {
         Match match = matchRepository.findById(id).get();
-        List<Rate> rateList = match.getRates();
+        ArrayList<Rate> rateList = new ArrayList<>(match.getRates());
         int result = getRandomNumber(1, 3);
         double winCoefficient;
         if (result == 1) {
@@ -69,7 +71,9 @@ public class MatchController {
             match.setResult(match.getSecondPlayerName());
             winCoefficient = match.getSecondCoefficient();
         }
-        for (Rate rate : rateList) {
+        ListIterator<Rate> itr = rateList.listIterator();
+        while (itr.hasNext()) {
+            Rate rate = itr.next();
             Balance userBalance = balanceRepository.findByUserUserId(rate.getUser().getUserId());
             if (Objects.equals(rate.getChoice(), match.getResult())) {
                  userBalance.setOverallBalance(userBalance.getOverallBalance() + (rate.getRateSum() * winCoefficient));
@@ -77,9 +81,11 @@ public class MatchController {
                     userBalance.setOverallBalance(userBalance.getOverallBalance() - rate.getRateSum());
             }
             userBalance.setRateBalance(userBalance.getRateBalance() - rate.getRateSum());
-            balanceRepository.save(userBalance);
+            balanceRepository.saveAndFlush(userBalance);
+            balanceRepository.flush();
             rate.setStatus("closed");
             rateRepository.save(rate);
+            rateRepository.flush();
         }
         matchRepository.save(match);
     }
